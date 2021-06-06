@@ -1,10 +1,12 @@
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets, mixins, status
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from .models import User, NewUserPhoneVerification
 from .permissions import IsUserOrReadOnly
 from .serializers import CreateUserSerializer, UserSerializer, SendNewPhonenumberSerializer
 from rest_framework.views import APIView
+from rest_framework.decorators import action
+from django.core.exceptions import ObjectDoesNotExist
 from . import utils
 
 class UserViewSet(mixins.RetrieveModelMixin,
@@ -16,6 +18,17 @@ class UserViewSet(mixins.RetrieveModelMixin,
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (IsUserOrReadOnly,)
+
+    @action(methods=['post'], detail=True, permission_classes=[IsUserOrReadOnly],
+            url_path='deposits', url_name='deposits')
+    def deposit(self, request, pk=None):
+        try:
+            User.objects.get(pk=pk)
+        except ObjectDoesNotExist:
+            return Response({"message":"User not found"}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response({"message":"Your account has been credited"}, status=status.HTTP_200_OK)
+
 
 
 class UserCreateViewSet(mixins.CreateModelMixin,
