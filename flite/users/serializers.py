@@ -1,6 +1,6 @@
 from django.db.models import fields
 from rest_framework import serializers
-from .models import User, NewUserPhoneVerification,UserProfile,Referral,
+from .models import User, NewUserPhoneVerification,UserProfile,Referral
 from . import utils
 
 class UserSerializer(serializers.ModelSerializer):

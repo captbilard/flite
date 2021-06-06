@@ -28,6 +28,17 @@ class UserViewSet(mixins.RetrieveModelMixin,
             return Response({"message":"User not found"}, status=status.HTTP_404_NOT_FOUND)
         else:
             return Response({"message":"Your account has been credited"}, status=status.HTTP_200_OK)
+    
+    @action(methods=['post'], detail=True, permission_classes=[IsUserOrReadOnly],
+            url_path='withdrawals', url_name='withdrawals')
+    def withdrawal(self, request, pk=None):
+        try:
+            User.objects.get(pk=pk)
+        except ObjectDoesNotExist:
+            return Response({"message":"User not found"}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response({"message":"Withdrawal successfull & account balance updated"}, status=status.HTTP_200_OK)
+
 
 
 
