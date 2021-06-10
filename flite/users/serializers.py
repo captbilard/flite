@@ -1,6 +1,6 @@
 from django.db.models import fields
 from rest_framework import serializers
-from .models import User, NewUserPhoneVerification,UserProfile,Referral
+from .models import User, NewUserPhoneVerification,UserProfile,Referral, Transaction
 from . import utils
 
 class UserSerializer(serializers.ModelSerializer):
@@ -34,7 +34,6 @@ class CreateUserSerializer(serializers.ModelSerializer):
             referral_code = validated_data.pop('referral_code',None)
             
         user = User.objects.create_user(**validated_data)
-        Balance.objects.create(owner=user)
         if referral_code:
             referral =Referral()
             referral.owner = self.reffered_profile.first().user
@@ -69,3 +68,16 @@ class SendNewPhonenumberSerializer(serializers.ModelSerializer):
         fields = ('id', 'phone_number', 'verification_code', 'email',)
         extra_kwargs = {'phone_number': {'write_only': True, 'required':True}, 'email': {'write_only': True}, }
         read_only_fields = ('id', 'verification_code')
+
+
+# class AccountSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Account
+#         fields = '__all__'
+
+
+class TransactionSerializer(serializers.ModelSerializer):
+       
+    class Meta:
+        model = Transaction
+        fields = '__all__'

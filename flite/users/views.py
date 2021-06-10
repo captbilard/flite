@@ -1,13 +1,14 @@
 from rest_framework import viewsets, mixins, status
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
-from .models import User, NewUserPhoneVerification
+from .models import User, NewUserPhoneVerification, Transaction
 from .permissions import IsUserOrReadOnly
-from .serializers import CreateUserSerializer, UserSerializer, SendNewPhonenumberSerializer
+from .serializers import CreateUserSerializer, UserSerializer, SendNewPhonenumberSerializer, TransactionSerializer
 from rest_framework.views import APIView
 from rest_framework.decorators import action
 from django.core.exceptions import ObjectDoesNotExist
 from . import utils
+from flite.users import serializers
 
 class UserViewSet(mixins.RetrieveModelMixin,
                   mixins.UpdateModelMixin,
@@ -77,4 +78,10 @@ class SendNewPhonenumberVerifyViewSet(mixins.CreateModelMixin,mixins.UpdateModel
                 'verification_code_status': str(code_status),
                 'message': msg,
         }
-        return Response(content, 200)    
+        return Response(content, 200)
+
+
+class TransactionViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,viewsets.GenericViewSet):
+    serializer_class = TransactionSerializer
+    def get_queryset(self):
+        return Transaction.objects.filter(owner=self.kwargs['username_pk'])

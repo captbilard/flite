@@ -1,4 +1,4 @@
-import uuid
+import uuid, random
 from flite.users import models
 
 def generate_new_user_passcode():
@@ -52,3 +52,27 @@ def validate_mobile_signup_sms(phone_number, code):
             new_user_code_obj.save()
             return 1, "Code verified"
     return 0, "The code provided is invalid. Kindly check and try again."
+
+
+def generate_transaction_reference():
+    """
+    Returns a unique transaction id
+    """
+    def _transaction_ref():
+        return str(random.randint(100000000000, 999999999999))
+    ref_number = _transaction_ref()
+    while models.Transaction.objects.filter(reference=ref_number).exists():
+        ref_number = _transaction_ref()
+    return ref_number
+
+
+# def generate_account_number():
+#     """
+#     Returns an account number
+#     """
+#     def _account_number():
+#         return str(random.randint(1000000000, 9999999999))
+#     wallet_number = _account_number()
+#     while models.Account.objects.filter(wallet_number=wallet_number).exists():
+#         wallet_number = _account_number()
+#     return wallet_number
