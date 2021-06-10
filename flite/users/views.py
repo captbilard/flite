@@ -1,9 +1,9 @@
 from rest_framework import viewsets, mixins, status
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
-from .models import User, NewUserPhoneVerification, Transaction
+from .models import User, NewUserPhoneVerification, Transaction, P2PTransfer
 from .permissions import IsUserOrReadOnly
-from .serializers import CreateUserSerializer, UserSerializer, SendNewPhonenumberSerializer, TransactionSerializer
+from .serializers import CreateUserSerializer, UserSerializer, SendNewPhonenumberSerializer, TransactionSerializer, P2PTransferSerializer
 from rest_framework.views import APIView
 from rest_framework.decorators import action
 from django.core.exceptions import ObjectDoesNotExist
@@ -83,5 +83,41 @@ class SendNewPhonenumberVerifyViewSet(mixins.CreateModelMixin,mixins.UpdateModel
 
 class TransactionViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,viewsets.GenericViewSet):
     serializer_class = TransactionSerializer
+    permission_classes = (IsUserOrReadOnly,)
+
     def get_queryset(self):
         return Transaction.objects.filter(owner=self.kwargs['username_pk'])
+
+class P2PTransferViewSet(viewsets.ModelViewSet):
+    serializer_class = P2PTransferSerializer
+    def get_queryset(self):
+        return P2PTransfer.objects.filter(owner=self.kwargs['username_pk'])
+    
+    def create(self, request, pk=None, **kwargs):
+        sender_data = request.data.get('sender')
+        receiver_data = request.data.get('receipient')
+
+        try:
+            sender = User.objects.get(pk=sender_data)
+            receiver = User.objects.get(pk=receiver_data)
+        except ObjectDoesNotExist:
+            return Response({
+                "message": "Sender or Receiver doesn't exist"
+            })
+        
+        transaction = Transaction.objects.create(
+            owner = sender,
+            status = "Successful"
+        )
+        
+        return Response({
+
+            "message" : "Transfer successful",
+            "from" : transaction.owner.username,
+            "to" : receiver.username,
+            "Ref. Number" : transaction.reference,
+            "status": transaction.status,
+            "new_balance" : transaction.new_balance
+        })
+
+    

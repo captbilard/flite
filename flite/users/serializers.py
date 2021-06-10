@@ -1,6 +1,6 @@
 from django.db.models import fields
 from rest_framework import serializers
-from .models import User, NewUserPhoneVerification,UserProfile,Referral, Transaction
+from .models import User, NewUserPhoneVerification,UserProfile,Referral, Transaction, P2PTransfer
 from . import utils
 
 class UserSerializer(serializers.ModelSerializer):
@@ -70,14 +70,27 @@ class SendNewPhonenumberSerializer(serializers.ModelSerializer):
         read_only_fields = ('id', 'verification_code')
 
 
-# class AccountSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Account
-#         fields = '__all__'
-
-
 class TransactionSerializer(serializers.ModelSerializer):
        
     class Meta:
         model = Transaction
         fields = '__all__'
+
+
+class P2PTransferSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = P2PTransfer
+        fields=('sender','receipient')
+    
+    # def create(self, validated_data):
+    #     owner = validated_data.get('sender')
+    #     receiver = validated_data.get('receipient')
+    #     p2p= P2PTransfer.objects.create(
+    #         owner=owner,
+    #         status="Successful",
+    #         sender = owner,
+    #         receipient = receiver
+
+    #     )
+    

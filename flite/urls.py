@@ -6,7 +6,7 @@ from django.views.generic.base import RedirectView
 from rest_framework.routers import DefaultRouter
 from rest_framework.authtoken import views
 from rest_framework_nested import routers
-from .users.views import UserViewSet, UserCreateViewSet, SendNewPhonenumberVerifyViewSet, TransactionViewSet
+from .users.views import UserViewSet, UserCreateViewSet, SendNewPhonenumberVerifyViewSet, TransactionViewSet, P2PTransferViewSet
 router = DefaultRouter()
 router.register(r'users', UserViewSet)
 router.register(r'users', UserCreateViewSet)
@@ -16,6 +16,9 @@ router.register(r'account', UserViewSet)
 #DRF Nested Routers Config
 account_router = routers.NestedDefaultRouter(router, r'account', lookup='username')
 account_router.register(r'transactions', TransactionViewSet, basename='account-transactions')
+account_router.register(r'transfers', P2PTransferViewSet, basename= 'account-transfer')
+
+#transfer_router = routers.NestedDefaultRouter(router, r'account', lookup='username')
 
 urlpatterns = [
     path('admin/', admin.site.urls),

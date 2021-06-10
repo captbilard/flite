@@ -79,17 +79,25 @@ class TestUserDetailTestCase(APITestCase):
 
 class TestTransactions(APITestCase):
 
+    def setUp(self):
+        self.user = UserFactory()
+        self.url = reverse('user-detail', kwargs={'pk': self.user.pk})
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.user.auth_token}')
+
     def test_user_can_make_a_deposit(self):
-        assert False
+        response = self.client.post(reverse('user-deposits', kwargs={'pk': self.user.pk}))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_user_can_make_a_withdrawal(self):
-        assert False
+        response = self.client.post(reverse('user-withdrawals', kwargs={'pk': self.user.pk}))
+        eq_(response.status_code, status.HTTP_200_OK)       
 
     def test_user_can_make_a_p2p_transfer(self):
         assert False
 
     def test_user_can_fetch_all_transactions(self):
-        assert False
+        response = self.client.get(reverse('account-transactions-list'))
+        eq_(response.status_code, status.HTTP_200_OK)
 
     def test_user_can_fetch_a_single_transaction(self):
         assert False
