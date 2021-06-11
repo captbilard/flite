@@ -84,9 +84,10 @@ class SendNewPhonenumberVerifyViewSet(mixins.CreateModelMixin,mixins.UpdateModel
 class TransactionViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,viewsets.GenericViewSet):
     serializer_class = TransactionSerializer
     permission_classes = (IsUserOrReadOnly,)
+    ordering=['created']
 
     def get_queryset(self):
-        return Transaction.objects.filter(owner=self.kwargs['username_pk'])
+        return Transaction.objects.filter(owner=self.kwargs['username_pk']).order_by('created')
 
 class P2PTransferViewSet(viewsets.ModelViewSet):
     serializer_class = P2PTransferSerializer
@@ -94,7 +95,7 @@ class P2PTransferViewSet(viewsets.ModelViewSet):
         return P2PTransfer.objects.filter(owner=self.kwargs['username_pk'])
     
     def create(self, request, pk=None, **kwargs):
-        sender_data = request.data.get('sender')
+        sender_data = request.user.id
         receiver_data = request.data.get('receipient')
 
         try:

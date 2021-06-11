@@ -83,6 +83,7 @@ class P2PTransferSerializer(serializers.ModelSerializer):
         model = P2PTransfer
         fields=('sender','receipient')
     
+    
     # def create(self, validated_data):
     #     owner = validated_data.get('sender')
     #     receiver = validated_data.get('receipient')

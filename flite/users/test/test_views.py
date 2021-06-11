@@ -2,11 +2,12 @@ from django.urls import reverse
 from django.forms.models import model_to_dict
 from django.contrib.auth.hashers import check_password
 from nose.tools import ok_, eq_
-from rest_framework.test import APITestCase
+from rest_framework.test import APITestCase,URLPatternsTestCase
 from rest_framework import status
 from faker import Faker
-from ..models import User,UserProfile,Referral
-from .factories import UserFactory
+from ..models import Transaction, User,UserProfile,Referral
+from .factories import UserFactory, TransactionFactory
+import factory
 
 fake = Faker()
 
@@ -78,27 +79,35 @@ class TestUserDetailTestCase(APITestCase):
         eq_(user.first_name, new_first_name)
 
 class TestTransactions(APITestCase):
-
+  
     def setUp(self):
         self.user = UserFactory()
+        self.transaction = TransactionFactory(owner=self.user)
         self.url = reverse('user-detail', kwargs={'pk': self.user.pk})
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.user.auth_token}')
 
     def test_user_can_make_a_deposit(self):
         response = self.client.post(reverse('user-deposits', kwargs={'pk': self.user.pk}))
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.status_code, status.HTTP_200_OK)
 
     def test_user_can_make_a_withdrawal(self):
         response = self.client.post(reverse('user-withdrawals', kwargs={'pk': self.user.pk}))
         eq_(response.status_code, status.HTTP_200_OK)       
 
     def test_user_can_make_a_p2p_transfer(self):
-        assert False
+        self.user2 = UserFactory()
+        self.url = f'/api/v1/account/{self.user.pk}/transfers/'
+        data = {'sender':self.user.id, 'receipient': self.user2.id}
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_user_can_fetch_all_transactions(self):
-        response = self.client.get(reverse('account-transactions-list'))
+        self.url = f'/api/v1/account/{self.user.pk}/transactions/'
+        response = self.client.get(self.url)
         eq_(response.status_code, status.HTTP_200_OK)
 
     def test_user_can_fetch_a_single_transaction(self):
-        assert False
+        self.url = f'/api/v1/account/{self.user.pk}/transactions/{self.transaction.id}/'
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 

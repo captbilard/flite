@@ -16,3 +16,18 @@ class UserFactory(factory.django.DjangoModelFactory):
     last_name = factory.Faker('last_name')
     is_active = True
     is_staff = False
+
+user = UserFactory()
+
+class TransactionFactory(factory.django.DjangoModelFactory):
+
+    class Meta:
+        model = 'users.Transaction'
+        django_get_or_create = ('owner',)
+    
+    id = factory.Faker('uuid4')
+    owner = user
+    status = 'successful'
+    reference = factory.Sequence(lambda n: f'12345678{n}{n}')
+    amount = 0.0
+    new_balance = 0.0
