@@ -1,3 +1,7 @@
 # Flite
 
-#TODO: update readme for local development 
+**Setup**:
+
+- You can run the project with
+
+` docker-compose up `

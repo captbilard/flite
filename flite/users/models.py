@@ -116,20 +116,8 @@ class Bank(models.Model):
     account_type = models.CharField(max_length=50)
 
 
-# class Account(models.Model):
-#     account_number = models.CharField(max_length=10, editable=False, default=utils.generate_account_number, primary_key=True)
-#     owner = models.OneToOneField('users.User', on_delete=models.CASCADE, related_name='account')
-
-#     def __str__(self):
-#         return f'{self.owner.username}\'s Account'
-    
-#     class Meta:
-#         verbose_name = 'Account'
-#         verbose_name_plural = 'Accounts'
-
 class Transaction(BaseModel):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_transaction')
-    #account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='account_transactions')
     reference = models.CharField(max_length=15,blank=True, default=utils.generate_transaction_reference)
     status = models.CharField(max_length=200)
     amount = models.FloatField(default=0.0)
